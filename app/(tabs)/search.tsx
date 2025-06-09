@@ -14,7 +14,23 @@ import {
 } from 'react-native';
 import { MealCard } from '../../components/MealCard';
 
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+// Definí las rutas y sus parámetros
+type RootStackParamList = {
+  Search: undefined;
+  MealDetail: { idMeal: string };
+};
+
+type SearchScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Search'
+>;
+
 export default function Search() {
+  const navigation = useNavigation<SearchScreenNavigationProp>();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [allMeals, setAllMeals] = useState<any[]>([]);
   const [results, setResults] = useState<any[]>([]);
@@ -62,6 +78,11 @@ export default function Search() {
     setResults(allMeals.slice(0, nextCount));
   };
 
+  // Función para ir al detalle, pasando el idMeal
+  const goToMealDetail = (idMeal: string) => {
+    navigation.navigate('MealDetail', { idMeal });
+  };
+
   return (
     <ThemedView style={styles.container}>
       <View style={styles.searchWrapper}>
@@ -79,7 +100,9 @@ export default function Search() {
       <FlatList
         data={results}
         keyExtractor={(item) => item.idMeal}
-        renderItem={({ item }) => <MealCard meal={item} />}
+        renderItem={({ item }) => (
+          <MealCard meal={item} onPress={() => goToMealDetail(item.idMeal)} />
+        )}
         ListEmptyComponent={<Text style={styles.emptyText}>No hay resultados</Text>}
         contentContainerStyle={results.length === 0 ? styles.emptyContainer : undefined}
       />
