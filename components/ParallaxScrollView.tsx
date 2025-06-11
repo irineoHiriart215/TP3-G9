@@ -1,82 +1,84 @@
-import type { PropsWithChildren, ReactElement } from 'react';
-import { StyleSheet } from 'react-native';
-import Animated, {
-  interpolate,
-  useAnimatedRef,
-  useAnimatedStyle,
-  useScrollViewOffset,
-} from 'react-native-reanimated';
-
+import React, { Children, PropsWithChildren } from 'react';
+import { ScrollView, StyleSheet, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/ThemedView';
 import { useBottomTabOverflow } from '@/components/ui/TabBarBackground';
 import { useColorScheme } from '@/hooks/useColorScheme';
-
-const HEADER_HEIGHT = 250;
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { Colors } from '@/constants/Colors'; 
 
 type Props = PropsWithChildren<{
-  headerImage: ReactElement;
-  headerBackgroundColor: { dark: string; light: string };
+  title?: string;
+  subtitle?: string;
+  scrollable?: boolean;
 }>;
 
 export default function ParallaxScrollView({
+  title,
+  subtitle,
+  scrollable = true,
   children,
-  headerImage,
-  headerBackgroundColor,
 }: Props) {
   const colorScheme = useColorScheme() ?? 'light';
-  const scrollRef = useAnimatedRef<Animated.ScrollView>();
-  const scrollOffset = useScrollViewOffset(scrollRef);
+  const colors = Colors[colorScheme];
+  const ScrollRef = React.useRef<ScrollView>(null);
   const bottom = useBottomTabOverflow();
-  const headerAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          translateY: interpolate(
-            scrollOffset.value,
-            [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
-            [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75]
-          ),
-        },
-        {
-          scale: interpolate(scrollOffset.value, [-HEADER_HEIGHT, 0, HEADER_HEIGHT], [2, 1, 1]),
-        },
-      ],
-    };
-  });
+  const tabBarHeight = useBottomTabBarHeight();
+
+  const Header = () => (
+    (title || subtitle) && (
+       <ThemedView style={styles.header}>
+        {title && <Text style={[styles.title, {color: colors.text}]}>{title}</Text>}
+        {subtitle && <Text style={[styles.subtitle, {color: colors.icon}]}>{subtitle}</Text>}
+      </ThemedView>
+    )
+  )
 
   return (
-    <ThemedView style={styles.container}>
-      <Animated.ScrollView
-        ref={scrollRef}
-        scrollEventThrottle={16}
-        scrollIndicatorInsets={{ bottom }}
-        contentContainerStyle={{ paddingBottom: bottom }}>
-        <Animated.View
-          style={[
-            styles.header,
-            { backgroundColor: headerBackgroundColor[colorScheme] },
-            headerAnimatedStyle,
-          ]}>
-          {headerImage}
-        </Animated.View>
-        <ThemedView style={styles.content}>{children}</ThemedView>
-      </Animated.ScrollView>
-    </ThemedView>
+    <SafeAreaView style={[styles.safeArea, {backgroundColor: colors.background}]}>
+      {scrollable ? (
+        <ScrollView
+          ref={ScrollRef}
+          style={styles.flex}
+          contentContainerStyle={[
+            styles.content,
+            scrollable && { paddingBottom: tabBarHeight +20},
+          ]}
+        >
+          <Header />
+          { children }
+        </ScrollView>
+      ):(
+        <ThemedView style={[styles.flex, styles.content]}>
+        <Header />
+        {children}
+      </ThemedView>
+      )}
+      
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
   },
-  header: {
-    height: HEADER_HEIGHT,
-    overflow: 'hidden',
+  flex: {
+    flex: 1,
   },
   content: {
-    flex: 1,
-    padding: 32,
-    gap: 16,
-    overflow: 'hidden',
+    paddingHorizontal: 24,
+    paddingTop: 24,
+  },
+  header: {
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+  },
+  subtitle: {
+    fontSize: 16,
+    marginTop: 4,
   },
 });

@@ -1,21 +1,39 @@
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
-export const MealCard = ({ meal, onPress }: { meal: any; onPress?: () => void }) => {
+type MealCardProps = {
+  meal: any;
+  onPress?: () => void;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
+  style?: object;
+}
+
+export const MealCard: React.FC<MealCardProps> = ({ meal, onPress, isFavorite = false, onToggleFavorite, style }) => {
+  const backgroundColor = useThemeColor({}, 'card');
+  const titleColor = useThemeColor({},'text');
+  const subtitleColor = useThemeColor({}, 'text');
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress}>
+    <TouchableOpacity style={[styles.card, {backgroundColor}, style]} onPress={onPress}>
       <Image source={{ uri: meal.strMealThumb }} style={styles.image} />
       <View style={styles.info}>
-        <Text style={styles.title} numberOfLines={2}>{meal.strMeal}</Text>
-        <Text style={styles.subtitle}>{meal.strCategory} · {meal.strArea}</Text>
+        <Text style={[styles.title, {color: titleColor}]} numberOfLines={2}>{meal.strMeal}</Text>
+        <Text style={[styles.subtitle, {color: subtitleColor}]}>{meal.strCategory} · {meal.strArea}</Text>
       </View>
+      {onToggleFavorite && (
+        <Pressable onPress={onToggleFavorite} style={styles.favoriteButton}>
+          <Text style={[styles.favoriteText, isFavorite ? styles.favActive : styles.favInactive]}>
+            {isFavorite ? '❤️' : '🤍'}
+          </Text>
+        </Pressable>
+      )}
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#1e1e1e',
     borderRadius: 16,
     overflow: 'hidden',
     marginVertical: 10,
@@ -35,12 +53,26 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    color: '#fff',
     fontWeight: 'bold',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: '#aaa',
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    padding: 6,
+    borderRadius: 20,
+  },
+  favoriteText: {
+    fontSize: 24,
+  },
+  favActive: {
+    color: 'red',
+  },
+  favInactive: {
+    color: 'white',
   },
 });

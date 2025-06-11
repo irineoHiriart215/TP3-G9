@@ -41,7 +41,6 @@ export default function MealDetail() {
       </View>
     );
 
-  // Extraemos ingredientes e medidas
   const ingredients = [];
   for (let i = 1; i <= 20; i++) {
     const ingredient = meal[`strIngredient${i}`];

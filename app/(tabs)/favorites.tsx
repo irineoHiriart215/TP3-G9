@@ -1,18 +1,42 @@
 // (tabs)/favorites.tsx
-import React from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import React, {useContext} from 'react';
+import { StyleSheet} from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { FavoritesContext } from '@/context/FavoritesContext';
+import { MealCard } from '../../components/MealCard'
+import { Receta } from '../../types/Receta'
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { SearchStackParamList } from '@/types/navigation';
+type SearchScreenNavigationProp = NativeStackNavigationProp<SearchStackParamList, 'Search'>;
+
 
 export default function Favorites() {
+  const { favorites, toggleFavorite } = useContext(FavoritesContext)
+  const navigation = useNavigation<SearchScreenNavigationProp>();
+  
+
   return (
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={<View style={{ flex: 1 }} />} 
+      title = 'Favoritos'
+      scrollable= {true}
       >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">🍽️ Favoritos</ThemedText>
+      <ThemedView style={styles.cardsContainer}>
+        {favorites.length === 0 ? (
+          <ThemedText style={styles.emptyText}>No tenés recetas favoritas aún.</ThemedText>
+        ) : (
+          favorites.map((meal: Receta) => (
+            <MealCard
+              key={meal.idMeal}
+              meal={meal}
+              onPress={() => navigation.navigate('MealDetail', { idMeal: meal.idMeal })}
+              isFavorite={true}
+              onToggleFavorite={() => toggleFavorite(meal)}
+            />
+          ))
+        )}
       </ThemedView>
     </ParallaxScrollView>
   );
@@ -24,5 +48,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     marginBottom: 16,
+  },
+  cardsContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 32,
+  },
+   emptyText: {
+    textAlign: 'center',
+    marginTop: 24,
   },
 });

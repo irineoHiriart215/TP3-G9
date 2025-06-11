@@ -3,7 +3,7 @@ import { ThemedInput } from '@/components/ThemedInput';
 import { ThemedView } from '@/components/ThemedView';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useContext } from 'react';
 import {
   FlatList,
   Keyboard,
@@ -13,11 +13,11 @@ import {
   View,
 } from 'react-native';
 import { MealCard } from '../../components/MealCard';
+import { FavoritesContext } from '@/context/FavoritesContext';
 
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-// Definí las rutas y sus parámetros
 type RootStackParamList = {
   Search: undefined;
   MealDetail: { idMeal: string };
@@ -30,12 +30,12 @@ type SearchScreenNavigationProp = NativeStackNavigationProp<
 
 export default function Search() {
   const navigation = useNavigation<SearchScreenNavigationProp>();
-
   const [searchQuery, setSearchQuery] = useState('');
   const [allMeals, setAllMeals] = useState<any[]>([]);
   const [results, setResults] = useState<any[]>([]);
   const [visibleCount, setVisibleCount] = useState(10);
   const [showingRandom, setShowingRandom] = useState(true);
+  const { favorites, toggleFavorite } = useContext(FavoritesContext);
 
   useFocusEffect(
     useCallback(() => {
@@ -78,14 +78,16 @@ export default function Search() {
     setResults(allMeals.slice(0, nextCount));
   };
 
-  // Función para ir al detalle, pasando el idMeal
   const goToMealDetail = (idMeal: string) => {
     navigation.navigate('MealDetail', { idMeal });
   };
+  
+  const isMealFavorite = (meal: any) =>
+    favorites.some((fav) => fav.idMeal === meal.idMeal);
 
   return (
     <ThemedView style={styles.container}>
-      <View style={styles.searchWrapper}>
+      <ThemedView style={styles.searchWrapper}>
         <Ionicons name="search" size={20} color="#888" style={styles.icon} />
         <ThemedInput
           placeholder="Buscar recetas..."
@@ -95,18 +97,23 @@ export default function Search() {
           onSubmitEditing={handleSearch}
           returnKeyType="search"
         />
-      </View>
+      </ThemedView>
 
       <FlatList
         data={results}
-        keyExtractor={(item) => item.idMeal}
+        keyExtractor={(item) => `meal-${item.idMeal}`}
         renderItem={({ item }) => (
-          <MealCard meal={item} onPress={() => goToMealDetail(item.idMeal)} />
+          <MealCard
+            meal={item}
+            onPress={() => goToMealDetail(item.idMeal)}
+            isFavorite={isMealFavorite(item)}
+            onToggleFavorite={() => toggleFavorite(item)}
+            style={{width: 360}}
+            />
         )}
         ListEmptyComponent={<Text style={styles.emptyText}>No hay resultados</Text>}
         contentContainerStyle={results.length === 0 ? styles.emptyContainer : undefined}
       />
-
       {results.length > 0 && results.length < allMeals.length && (
         <TouchableOpacity onPress={handleLoadMore} style={styles.loadMoreButton}>
           <Text style={styles.loadMoreText}>Ver más</Text>
@@ -126,6 +133,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
+    width: 250,
   },
   searchWrapper: {
     width: '100%',
