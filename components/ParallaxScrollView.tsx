@@ -29,7 +29,7 @@ export default function ParallaxScrollView({
     (title || subtitle) && (
        <ThemedView style={styles.header}>
         {title && <Text style={[styles.title, {color: colors.text}]}>{title}</Text>}
-        {subtitle && <Text style={[styles.subtitle, {color: colors.icon}]}>{subtitle}</Text>}
+        {subtitle && <Text style={[styles.subtitle, {color: colors.text}]}>{subtitle}</Text>}
       </ThemedView>
     )
   )

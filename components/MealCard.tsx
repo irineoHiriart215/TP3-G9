@@ -12,14 +12,14 @@ type MealCardProps = {
 
 export const MealCard: React.FC<MealCardProps> = ({ meal, onPress, isFavorite = false, onToggleFavorite, style }) => {
   const backgroundColor = useThemeColor({}, 'card');
-  const titleColor = useThemeColor({},'text');
+  const titleColor = useThemeColor({},'primary');
   const subtitleColor = useThemeColor({}, 'text');
   return (
     <TouchableOpacity style={[styles.card, {backgroundColor}, style]} onPress={onPress}>
       <Image source={{ uri: meal.strMealThumb }} style={styles.image} />
       <View style={styles.info}>
         <Text style={[styles.title, {color: titleColor}]} numberOfLines={2}>{meal.strMeal}</Text>
-        <Text style={[styles.subtitle, {color: subtitleColor}]}>{meal.strCategory} · {meal.strArea}</Text>
+        <Text style={[styles.subtitle, {color: titleColor}]}>{meal.strCategory} · {meal.strArea}</Text>
       </View>
       {onToggleFavorite && (
         <Pressable onPress={onToggleFavorite} style={styles.favoriteButton}>

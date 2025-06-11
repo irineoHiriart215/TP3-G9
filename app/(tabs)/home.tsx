@@ -16,6 +16,8 @@ type SearchScreenNavigationProp = NativeStackNavigationProp<SearchStackParamList
 export default function Home() {
   const cardColor = useThemeColor({}, 'card');
   const textColor = useThemeColor({}, 'text');
+  const primaryColor = useThemeColor({}, 'primary');
+  const secondaryText = useThemeColor({},'primary');
   const [randomMeals, setRandomMeals] = useState<any[]>([]);
   const { favorites, toggleFavorite } = useContext(FavoritesContext);
   const navigation = useNavigation<SearchScreenNavigationProp>();
@@ -48,7 +50,7 @@ export default function Home() {
       subtitle= "Descubri y guarda tus recetas favoritas"
       scrollable= {true}
       >
-      <ThemedView style={[styles.card, {backgroundColor: cardColor}]}>
+      <ThemedView style={[styles.card, {backgroundColor: primaryColor}]}>
         <ThemedText type="subtitle" style={styles.cardTitle}>Ultimas Recetas</ThemedText>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {randomMeals.map((meal) => (
@@ -63,7 +65,7 @@ export default function Home() {
           ))}
         </ScrollView>
       </ThemedView>
-      <ThemedView style={[styles.card, {backgroundColor: cardColor}]}>
+      <ThemedView style={[styles.card, {backgroundColor: primaryColor}]}>
         <ThemedText type="subtitle" style={styles.cardTitle}>Mis recetas Favoritas</ThemedText>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           { favorites. length === 0 ? (
@@ -84,7 +86,7 @@ export default function Home() {
           )}
         </ScrollView>
       </ThemedView>
-      <ThemedView style={[styles.card, {backgroundColor: cardColor}]}>
+      <ThemedView style={[styles.card, {backgroundColor: primaryColor}]}>
         <ThemedText type="subtitle" style={styles.cardTitle}>Tendencias</ThemedText>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {tendenciaMeals.map((meal) => (
