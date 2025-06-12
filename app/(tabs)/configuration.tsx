@@ -1,74 +1,92 @@
-// (tabs)/index.tsx
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
+import ParallaxScrollView from '@/components/ParallaxScrollView';
+import { useThemeColor } from '@/hooks/useThemeColor';
+import { SettingsItem }  from '@/components/SettingsItem';
 
 export default function Settings() {
+  const primaryColor = useThemeColor({}, 'primary');
+  const cardColor = useThemeColor({}, 'card');
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.profileContainer}>
-        <View>
+    <ParallaxScrollView title="Configuración" scrollable={false}>
+      <ThemedView style={styles.container}>
+        <ThemedView style={[styles.profileContainer, { backgroundColor: backgroundColor }]}>
           <Image
-          source={{}}
-          style={styles.avatar}
-        />
+            source={{ uri: 'https://ui-avatars.com/api/?name=Juan+Pérez' }}
+            style={styles.avatar}
+          />
           <ThemedText type="title">Juan Pérez</ThemedText>
-          <ThemedText type="default">juan.perez@email.com</ThemedText>
+          <ThemedText style={{ color: textColor }}>juan.perez@email.com</ThemedText>
+        </ThemedView>
+
+        <View style={styles.section}>
+          <SectionTitle title="Preferencias" />
+          <SettingsItem icon="moon" text="Tema: Claro / Oscuro" />
+          <SettingsItem icon="notifications" text="Notificaciones" />
+          <SettingsItem icon="language" text="Idioma: Español" />
         </View>
-      </View>
 
-      <View style={styles.section}>
-        <SettingsItem icon="moon" text="Tema: Claro / Oscuro" />
-        <SettingsItem icon="notifications" text="Notificaciones" />
-        <SettingsItem icon="language" text="Idioma: Español" />
-      </View>
-
-      <View style={styles.section}>
-        <SettingsItem icon="help-circle" text="Centro de ayuda" />
-        <SettingsItem icon="mail" text="Contacto" />
-        <SettingsItem icon="log-out" text="Cerrar sesión" />
-      </View>
-    </ThemedView>
+        <View style={styles.section}>
+          <SectionTitle title="Soporte y cuenta" />
+          <SettingsItem icon="help-circle" text="Centro de ayuda" />
+          <SettingsItem icon="mail" text="Contacto" />
+          <SettingsItem icon="log-out" text="Cerrar sesión" danger/>
+        </View>
+      </ThemedView>
+    </ParallaxScrollView>
   );
 }
 
-function SettingsItem({ icon, text }: { icon: any; text: string }) {
+function SectionTitle({ title }: { title: string }) {
+  const textColor = useThemeColor({}, 'text');
   return (
-    <TouchableOpacity style={styles.item}>
-      <Ionicons name={icon} size={20} color="#555" style={styles.itemIcon} />
-      <ThemedText style={styles.itemText}>{text}</ThemedText>
-    </TouchableOpacity>
+    <ThemedText style={[styles.sectionTitle, { color: textColor }]}>{title}</ThemedText>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 40,
+    paddingTop: 10,
     paddingHorizontal: 24,
-    gap: 24,
+    paddingBottom: 32,
+    gap: 32,
   },
   profileContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
-    marginBottom: 30,
+    padding: 16,
+    borderRadius: 12,
+    gap: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    elevation: 2,
   },
   avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
   },
   section: {
     gap: 16,
-    marginBottom: 30,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 4,
+    opacity: 0.8,
   },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: 8,
   },
   itemIcon: {
     marginRight: 12,

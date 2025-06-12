@@ -3,7 +3,6 @@ import { ScrollView, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/ThemedView';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Colors } from '@/constants/Colors'; 
 
 type Props = PropsWithChildren<{
@@ -21,7 +20,6 @@ export default function ParallaxScrollView({
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
   const ScrollRef = React.useRef<ScrollView>(null);
-  const tabBarHeight = useBottomTabBarHeight();
 
   const Header = () => (
     (title || subtitle) && (
@@ -40,7 +38,7 @@ export default function ParallaxScrollView({
           style={styles.flex}
           contentContainerStyle={[
             styles.content,
-            scrollable && { paddingBottom: tabBarHeight +20},
+            scrollable && { paddingBottom:20},
           ]}
         >
           <Header />
@@ -65,8 +63,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingHorizontal: 16,
-    paddingTop: 18,
+    paddingHorizontal: 24,
+    paddingTop: 24,
   },
   header: {
     marginBottom: 20,
@@ -77,6 +75,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    marginTop: 2,
+    marginTop: 4,
   },
 });

@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Search from '../app/(tabs)/search';
 import MealDetail from '../app/MealDetail';
 import { SearchStackParamList } from '@/types/navigation';
+import { View } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<SearchStackParamList>();
@@ -30,26 +31,41 @@ function SearchStack() {
 }
 
 export default function AppNavigator() {
-  const colorScheme = useColorScheme() ?? 'light';
-  const themeColors = Colors[colorScheme];
+  const colorScheme = useColorScheme() ?? 'dark';
+  const colors = Colors[colorScheme];
 
   return (
     <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Tab.Navigator
         screenOptions={({ route }) => ({
+          tabBarBackground: () => (
+            <View style={{ flex: 1, backgroundColor: colors.background }} />
+          ),
           headerShown: false,
-          tabBarStyle: { backgroundColor: themeColors.background, borderTopWidth: 0 },
-          tabBarActiveTintColor: themeColors.tint,
-          tabBarInactiveTintColor: themeColors.tabIconDefault,
-          tabBarIcon: ({ focused, color, size }) => {
+          tabBarActiveTintColor: colors.tabIconSelected,
+          tabBarInactiveTintColor: colors.tabIconDefault,
+          tabBarIcon: ({ focused, color, size }) => {            
             let iconName: keyof typeof Ionicons.glyphMap = 'search';
+              switch (route.name) {
+                case 'SearchTab':
+                  iconName = 'search';
+                  break;
+                case 'FavoritesTab':
+                  iconName = 'heart';
+                  break;
+                case 'ProfileTab':
+                  iconName = 'person';
+                  break;
+                case 'HomeTab':
+                  iconName = 'home';
+                  break;
+                case 'SettingsTab':
+                  iconName = 'settings';
+                  break;
+              }
 
-            if ( route.name === 'SearchTab') {
-              iconName = focused ? 'search' : 'search-outline'
+              return <Ionicons name={iconName} size={size} color={color} />;
             }
-
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
         })}
       >
         <Tab.Screen name="SearchTab" component={SearchStack} options={{ title: 'Buscar' }} />

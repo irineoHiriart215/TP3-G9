@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { Ionicons } from '@expo/vector-icons';
 
 type MealCardProps = {
   meal: any;
@@ -11,21 +12,24 @@ type MealCardProps = {
 }
 
 export const MealCard: React.FC<MealCardProps> = ({ meal, onPress, isFavorite = false, onToggleFavorite, style }) => {
-  const backgroundColor = useThemeColor({}, 'card');
-  const titleColor = useThemeColor({},'primary');
-  const subtitleColor = useThemeColor({}, 'text');
+  const textColor = useThemeColor({},'text');
+  const primary = useThemeColor({}, 'primary');
+  const secondary = useThemeColor({}, 'secondary');
+  const card = useThemeColor({}, 'card')
   return (
-    <TouchableOpacity style={[styles.card, {backgroundColor}, style]} onPress={onPress}>
+    <TouchableOpacity style={[styles.card,{ backgroundColor: card}, style]} onPress={onPress}>
       <Image source={{ uri: meal.strMealThumb }} style={styles.image} />
       <View style={styles.info}>
-        <Text style={[styles.title, {color: titleColor}]} numberOfLines={2}>{meal.strMeal}</Text>
-        <Text style={[styles.subtitle, {color: titleColor}]}>{meal.strCategory} · {meal.strArea}</Text>
+        <Text style={[styles.title, {color: textColor}]} numberOfLines={2}>{meal.strMeal}</Text>
+        <Text style={[styles.subtitle, {color: textColor}]}>{meal.strCategory} · {meal.strArea}</Text>
       </View>
       {onToggleFavorite && (
         <Pressable onPress={onToggleFavorite} style={styles.favoriteButton}>
-          <Text style={[styles.favoriteText, isFavorite ? styles.favActive : styles.favInactive]}>
-            {isFavorite ? '❤️' : '🤍'}
-          </Text>
+          <Ionicons
+            name={isFavorite ? 'heart' : 'heart'}
+            size={24}
+            color={isFavorite ? secondary : primary }
+           />
         </Pressable>
       )}
     </TouchableOpacity>
@@ -65,6 +69,7 @@ const styles = StyleSheet.create({
     right: 12,
     padding: 6,
     borderRadius: 20,
+    bottom: 2,
   },
   favoriteText: {
     fontSize: 24,

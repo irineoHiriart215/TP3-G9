@@ -33,6 +33,7 @@ export default function Favorites() {
               meal={meal}
               onPress={() => navigation.navigate('MealDetail', { idMeal: meal.idMeal })}
               isFavorite={true}
+              style={{width: 360}}
               onToggleFavorite={() => toggleFavorite(meal)}
             />
           ))
@@ -46,11 +47,10 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
     marginBottom: 16,
   },
   cardsContainer: {
-    paddingHorizontal: 16,
+    alignItems: 'center',
     paddingBottom: 32,
   },
    emptyText: {

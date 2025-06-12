@@ -1,45 +1,38 @@
 // login.tsx
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet} from 'react-native';
 import { Link, router } from 'expo-router';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
+import NoLoggedView from '@/components/NoLooggedView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import PrimaryButton from '@/components/PrimaryButton';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ThemedInput } from '@/components/ThemedInput';
-
+import { useThemeColor } from '@/hooks/useThemeColor';
 
 export default function Login() {
+  const primaryColor = useThemeColor({}, 'primary');
+  const cardColor = useThemeColor({}, 'card');
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={<View style={{ flex: 1 }} />}
+    <NoLoggedView
+      title ='Bienvenido a FoddieApp.'
+      subtitle='¿No sabes que cocinar? Estas en el lugar correcto'
+      scrollable= {false}
       >
-        <MaterialCommunityIcons
-          name="chef-hat"
-          size={64}
-          color="#4CAF50"
-          style={{ alignSelf: 'center', marginBottom: 16 }}
-        />
-          <ThemedView style={styles.titleContainer}>
-            <ThemedText type="title">Bienvenido a Foodie App.</ThemedText>
-          </ThemedView>
-            <ThemedText type="subtitle" style={{textAlign: 'center'}}>¿No sabes que cocinar?</ThemedText>
-            <ThemedText type="subtitle" style={{marginBottom: 20, textAlign: 'center'}}>¡Estas en el lugar correcto!</ThemedText>
+       <ThemedView style={[styles.wrapper,{ backgroundColor : backgroundColor }]}>
+        <ThemedView style={[styles.card, { backgroundColor: cardColor }]}>
+          <ThemedText type="subtitle" style={styles.cardTitle}>¿Cómo funciona?</ThemedText>
+          <ThemedText><TextHighlight>Paso 1:</TextHighlight> Inicia sesión o crea una cuenta. Si no tienes una cuenta, registrate haciendo{' '}
+            <Link href='/register'>
+              <ThemedText type="defaultSemiBold" style={{ color: textColor }}>click acá</ThemedText>
+            </Link>.
+          </ThemedText>
+          <ThemedText><TextHighlight>Paso 2:</TextHighlight> Explora cientos de recetas diseñadas para vos.</ThemedText>
+          <ThemedText><TextHighlight>Paso 3:</TextHighlight> ¡A cocinar! Seguí el paso a paso y disfrutá.</ThemedText>
+        </ThemedView>
 
-            <ThemedView style={styles.stepContainer}>
-              <ThemedText type="subtitle">Paso 1: Inicia sesion.</ThemedText>
-              <ThemedText>Si no tienes una cuenta, registrate haciendo<ThemedText type="defaultSemiBold"><Link href='/register'> click aca. </Link></ThemedText></ThemedText>
-
-              <ThemedText type="subtitle">Paso 2: Explora nuestras recetas</ThemedText>
-              <ThemedText>Descubre miles de recetas y selecciona la que mas te guste.</ThemedText>
-
-              <ThemedText type="subtitle">Paso 3: ¡Manos a la obra!</ThemedText>
-              <ThemedText>Sigue el paso a paso y disfruta preparando tus platos preferidos.</ThemedText>
-            </ThemedView>
-
-            <ThemedView style={styles.container}>
+        <ThemedView style={styles.container}>
               <ThemedInput
                 placeholder="Email"
                 autoCapitalize="none"
@@ -51,45 +44,45 @@ export default function Login() {
               />
               <PrimaryButton title="Iniciar Sesion" onPress={() => router.push('/(tabs)/home')}/>
             </ThemedView>
-    </ParallaxScrollView>
+      </ThemedView>
+    </NoLoggedView>
+  );
+}
+
+function TextHighlight({ children }: { children: React.ReactNode }) {
+  return (
+    <ThemedText type="defaultSemiBold" style={{ fontSize: 16 }}>
+      {children}
+    </ThemedText>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-   container: {
+  wrapper: {
     flex: 1,
+    gap: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    justifyContent: 'center',
+  },
+  container: {
+    flex: 1,
+    gap: 12,
+    marginTop: 24,
     padding: 16,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  card: {
+    padding: 20,
+    borderRadius: 16,
+    gap: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
   },
-  input: {
-  backgroundColor: '#1d3d47',
-  borderRadius: 10,
-  padding: 10,
-  color: '#fff',
-  borderColor: '#3e6e7f',
-  borderWidth: 1,
-  marginVertical: 8,
-}
+  cardTitle: {
+    fontSize: 18,
+    marginBottom: 8,
+  },
 });

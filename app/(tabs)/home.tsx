@@ -11,13 +11,12 @@ import { FavoritesContext } from '@/context/FavoritesContext';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SearchStackParamList } from '@/types/navigation';
+import { Background } from '@react-navigation/elements';
 type SearchScreenNavigationProp = NativeStackNavigationProp<SearchStackParamList, 'Search'>;
 
 export default function Home() {
-  const cardColor = useThemeColor({}, 'card');
   const textColor = useThemeColor({}, 'text');
   const primaryColor = useThemeColor({}, 'primary');
-  const secondaryText = useThemeColor({},'primary');
   const [randomMeals, setRandomMeals] = useState<any[]>([]);
   const { favorites, toggleFavorite } = useContext(FavoritesContext);
   const navigation = useNavigation<SearchScreenNavigationProp>();
@@ -106,25 +105,9 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    paddingHorizontal: 24,
-    paddingTop: 40,
-    paddingBottom: 20,
-  },
-  titleSection:{
-    alignItems: 'flex-start',
-  },
-  title:{
-    fontSize: 28,
-    fontWeight: 'bold'
-  },
-  subtitle: {
-    marginTop: 4,
-    fontSize: 16,
-  },
   card: {
-    marginHorizontal: 16,
-    marginBottom: 20,
+    marginHorizontal: 4,
+    marginBottom: 10,
     padding: 16,
     borderRadius: 16,
     shadowColor: '#000',

@@ -10,10 +10,16 @@ import {
     Text,
     View,
 } from 'react-native';
+import { useThemeColor } from '@/hooks/useThemeColor';
+import { ThemedView } from '@/components/ThemedView';
 
 export default function MealDetail() {
   const route = useRoute();
   const { idMeal } = route.params as { idMeal: string };
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({},'text');
+  const primary = useThemeColor({}, 'primary');
+  const secondary = useThemeColor({}, 'secondary');
 
   const [meal, setMeal] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -51,28 +57,31 @@ export default function MealDetail() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, {backgroundColor: backgroundColor}]}>
       <Image source={{ uri: meal.strMealThumb }} style={styles.image} />
 
-      <Text style={styles.title}>{meal.strMeal}</Text>
+      <Text style={[styles.title,{color: textColor}]}>{meal.strMeal}</Text>
 
-      <View style={styles.infoContainer}>
-        <Text style={styles.category}>{meal.strCategory}</Text>
-        <Text style={styles.area}>{meal.strArea}</Text>
-      </View>
+      <ThemedView style={styles.infoContainer}>
+        <Text style={[styles.category,{backgroundColor: secondary}]}>{meal.strCategory}</Text>
+        <Text style={[styles.area,{backgroundColor: secondary}]}>{meal.strArea}</Text>
+      </ThemedView>
 
-      <Text style={styles.sectionTitle}>Ingredientes</Text>
-      <View style={styles.ingredientsList}>
-        {ingredients.map((item, idx) => (
-          <View key={idx} style={styles.ingredientItem}>
-            <Ionicons name="checkmark-circle" size={20} color="#61dafb" />
-            <Text style={styles.ingredientText}>{item}</Text>
-          </View>
-        ))}
-      </View>
-
-      <Text style={styles.sectionTitle}>Instrucciones</Text>
-      <Text style={styles.instructions}>{meal.strInstructions}</Text>
+      <ThemedView style={[styles.card, {backgroundColor: primary}]}>
+        <Text style={[styles.sectionTitle, {color: textColor, borderBottomColor: secondary}]}>Ingredientes</Text>
+        <View>
+          {ingredients.map((item, idx) => (
+            <View key={idx} style={styles.ingredientItem}>
+              <Ionicons name="checkmark-circle" size={20} color={secondary} />
+              <Text style={[styles.ingredientText, {color: textColor}]}>{item}</Text>
+            </View>
+          ))}
+        </View>
+      </ThemedView>
+      <ThemedView style={[styles.card, {backgroundColor: primary}]}>
+        <Text style={[styles.sectionTitle, {color:textColor, borderBottomColor: secondary}]}>Instrucciones</Text>
+        <Text style={[styles.instructions, {color: textColor}]}>{meal.strInstructions}</Text>
+      </ThemedView>
     </ScrollView>
   );
 }
@@ -83,6 +92,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  card: {
+    marginHorizontal: 16,
+    marginBottom: 20,
+    padding: 16,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   errorContainer: {
     flex: 1,
@@ -97,7 +117,6 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 20,
-    backgroundColor: '#121212',
     paddingBottom: 40,
   },
   image: {
@@ -113,7 +132,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '900',
-    color: '#61dafb',
     textAlign: 'center',
     marginBottom: 10,
     textShadowColor: '#00000088',
@@ -129,7 +147,6 @@ const styles = StyleSheet.create({
   category: {
     fontSize: 18,
     color: '#bbb',
-    backgroundColor: '#222222bb',
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 14,
@@ -138,7 +155,6 @@ const styles = StyleSheet.create({
   area: {
     fontSize: 18,
     color: '#bbb',
-    backgroundColor: '#222222bb',
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 14,
@@ -147,15 +163,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#61dafb',
     marginBottom: 12,
-    borderBottomColor: '#61dafb',
     borderBottomWidth: 2,
     paddingBottom: 6,
   },
-  ingredientsList: {
-    marginBottom: 24,
-  },
+
   ingredientItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -164,7 +176,6 @@ const styles = StyleSheet.create({
   ingredientText: {
     marginLeft: 10,
     fontSize: 16,
-    color: '#ddd',
   },
   instructions: {
     fontSize: 16,

@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { MealCard } from '../../components/MealCard';
 import { FavoritesContext } from '@/context/FavoritesContext';
-
+import { useThemeColor } from '@/hooks/useThemeColor';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -36,6 +36,12 @@ export default function Search() {
   const [visibleCount, setVisibleCount] = useState(10);
   const [showingRandom, setShowingRandom] = useState(true);
   const { favorites, toggleFavorite } = useContext(FavoritesContext);
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({},'text');
+  const primary = useThemeColor({}, 'primary');
+  const secondary = useThemeColor({}, 'secondary');
+  const [isFocused, setIsFocused] = useState(false);
+
 
   useFocusEffect(
     useCallback(() => {
@@ -60,7 +66,6 @@ export default function Search() {
       setShowingRandom(true);
       return;
     }
-
     const meals = await searchMeals(searchQuery);
     const filtered = meals.filter((meal: any) =>
       meal.strMeal.toLowerCase().startsWith(searchQuery.toLowerCase())
@@ -86,16 +91,18 @@ export default function Search() {
     favorites.some((fav) => fav.idMeal === meal.idMeal);
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[styles.container, {backgroundColor: backgroundColor}]}>
       <ThemedView style={styles.searchWrapper}>
-        <Ionicons name="search" size={20} color="#888" style={styles.icon} />
+        <Ionicons name="search" size={20} color={ isFocused ? secondary : textColor} style={styles.icon} />
         <ThemedInput
           placeholder="Buscar recetas..."
-          style={styles.searchInput}
+          style={[styles.searchInput, isFocused && { borderColor: secondary}]}
           value={searchQuery}
           onChangeText={setSearchQuery}
           onSubmitEditing={handleSearch}
           returnKeyType="search"
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
         />
       </ThemedView>
 
@@ -134,6 +141,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     width: 250,
+    outlineWidth: 0,
   },
   searchWrapper: {
     width: '100%',
