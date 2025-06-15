@@ -46,5 +46,16 @@
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0"
   },
-  "private": true
+  "private": true,
+  "description": "<<<<<<< HEAD\r # TP3-G9\r Desarrollo de Trabajo Practico 3 - Desarrollo de Aplicaciones Moviles.\r =======\r # Welcome to your Expo app 👋",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/irineoHiriart215/TP3-G9.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/irineoHiriart215/TP3-G9/issues"
+  },
+  "homepage": "https://github.com/irineoHiriart215/TP3-G9#readme"
 }

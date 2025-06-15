@@ -21,7 +21,13 @@ export default function ParallaxScrollView({
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
   const ScrollRef = React.useRef<ScrollView>(null);
-  const tabBarHeight = useBottomTabBarHeight();
+  let tabBarHeight = 0;
+  try {
+    tabBarHeight = useBottomTabBarHeight();
+  } catch (e) {
+    tabBarHeight = 0; // fallback si no está dentro del tab navigator
+  }
+
 
   const Header = () => (
     (title || subtitle) && (
