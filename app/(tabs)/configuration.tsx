@@ -6,23 +6,27 @@ import { Ionicons } from '@expo/vector-icons';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { SettingsItem }  from '@/components/SettingsItem';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Settings() {
   const primaryColor = useThemeColor({}, 'primary');
   const cardColor = useThemeColor({}, 'card');
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
+  const { user, logout } = useAuth();
 
   return (
     <ParallaxScrollView title="Configuración" scrollable={false}>
       <ThemedView style={styles.container}>
         <ThemedView style={[styles.profileContainer, { backgroundColor: backgroundColor }]}>
           <Image
-            source={{ uri: 'https://ui-avatars.com/api/?name=Juan+Pérez' }}
+            source={{
+              uri: `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name ?? '')}`,
+            }}
             style={styles.avatar}
           />
-          <ThemedText type="title">Juan Pérez</ThemedText>
-          <ThemedText style={{ color: textColor }}>juan.perez@email.com</ThemedText>
+          <ThemedText type="title">{user?.name}</ThemedText>
+          <ThemedText style={{ color: textColor }}>{user?.email}</ThemedText>
         </ThemedView>
 
         <View style={styles.section}>
@@ -36,7 +40,7 @@ export default function Settings() {
           <SectionTitle title="Soporte y cuenta" />
           <SettingsItem icon="help-circle" text="Centro de ayuda" />
           <SettingsItem icon="mail" text="Contacto" />
-          <SettingsItem icon="log-out" text="Cerrar sesión" danger/>
+          <SettingsItem icon="log-out" text="Cerrar sesión" danger onPress={logout}/>
         </View>
       </ThemedView>
     </ParallaxScrollView>
