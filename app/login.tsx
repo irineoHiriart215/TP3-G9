@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Link, router } from 'expo-router';
 import NoLoggedView from '@/components/NoLooggedView';
 import { ThemedText } from '@/components/ThemedText';
@@ -13,6 +13,7 @@ export default function Login() {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const primaryColor = useThemeColor({}, 'primary');
   const cardColor = useThemeColor({}, 'card');
@@ -21,14 +22,16 @@ export default function Login() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      return Alert.alert('Error', 'Por favor ingresá email y contraseña.');
+      setError('Completá ambos campos');
+      return;
     }
 
     try {
       await login(email, password);
       router.replace('/(tabs)/home'); // redirige a home si inicia sesión correctamente
+      setError('');
     } catch (error: any) {
-      Alert.alert('Error de inicio de sesión', error.message || 'Ocurrió un error');
+      setError(error.message || 'Error al iniciar sesión');
     }
   };
 
@@ -51,15 +54,23 @@ export default function Login() {
         </ThemedView>
 
         <ThemedView style={styles.container}>
+          {error ? (
+            <ThemedText style={{ color: 'red', textAlign: 'center' }}>
+              {error}
+            </ThemedText>
+          ) : null}
+          
+          <ThemedText>Email</ThemedText>
           <ThemedInput
-            placeholder="Email"
+            placeholder="Ej.: ejemplo@ejemplo.com"
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
             keyboardType="email-address"
           />
+          <ThemedText>Contraseña</ThemedText>
           <ThemedInput
-            placeholder="Contraseña"
+            placeholder="Ej.: juan123"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -90,13 +101,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     gap: 12,
-    marginTop: 24,
+    marginTop: 5,
     padding: 16,
   },
   card: {
     padding: 20,
     borderRadius: 16,
-    gap: 12,
+    gap: 6,
     elevation: 2,
     shadowColor: '#000',
     shadowOpacity: 0.1,
@@ -105,6 +116,11 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 18,
+    marginBottom: 4,
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
     marginBottom: 8,
   },
 });

@@ -34,11 +34,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const usersJson = await AsyncStorage.getItem('users');
     const users = usersJson ? JSON.parse(usersJson) : [];
 
-    const foundUser = users.find(
-      (u: User) => u.email === email && u.password === password
-    );
+    const foundUser = users.find((u: User) => u.email === email);
 
-    if (!foundUser) throw new Error('Credenciales incorrectas');
+    if (!foundUser) throw new Error('Email no registrado');
+    if (foundUser.password !== password) throw new Error('Contraseña incorrecta');
 
     setUser(foundUser);
     await AsyncStorage.setItem('user', JSON.stringify(foundUser));

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -15,20 +15,24 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [repeatPassword, setRepeatPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleRegister = async () => {
     if (!name || !email || !password || !repeatPassword) {
-      return Alert.alert('Error', 'Completa todos los campos.');
+      setError('Todos los campos tienen que estar completos');
+      return;
     }
     if (password !== repeatPassword) {
-      return Alert.alert('Error', 'Las contraseñas no coinciden.');
+      setError('Las contraseñas no coinciden')
+      return;
     }
 
     try {
       await register(name, email, password);
       router.replace('/(tabs)/home');
+      setError('');
     } catch (error: any) {
-      Alert.alert('Error al registrarse', error.message || 'Ocurrió un error.');
+      setError(error.message || 'Error al registrarse');
     }
   };
 
@@ -40,12 +44,22 @@ export default function Register() {
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Registro</ThemedText>
       </ThemedView>
+      
+      {error ? (
+        <ThemedText style={{ color: 'red', textAlign: 'center', marginTop: 10 }}>
+          {error}
+        </ThemedText>
+      ) : null}
 
       <ThemedView style={styles.stepContainer}>
-        <ThemedInput placeholder="Nombre Completo" value={name} onChangeText={setName} />
-        <ThemedInput placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" />
-        <ThemedInput placeholder="Contraseña" value={password} onChangeText={setPassword} secureTextEntry />
-        <ThemedInput placeholder="Repetir Contraseña" value={repeatPassword} onChangeText={setRepeatPassword} secureTextEntry />
+        <ThemedText>Nombre completo</ThemedText>
+        <ThemedInput placeholder="Ej.: Juan Perez" value={name} onChangeText={setName} />
+        <ThemedText>Email</ThemedText>
+        <ThemedInput placeholder="Ej.: ejemplo@ejemplo.com" value={email} onChangeText={setEmail} keyboardType="email-address" />
+        <ThemedText>Contraseña</ThemedText>
+        <ThemedInput placeholder="Ej.: juan123" value={password} onChangeText={setPassword} secureTextEntry />
+        <ThemedText>Confirmar contraseña</ThemedText>
+        <ThemedInput placeholder="Ej.: juan123" value={repeatPassword} onChangeText={setRepeatPassword} secureTextEntry />
         <PrimaryButton title="Registrarme" onPress={handleRegister} />
       </ThemedView>
     </ParallaxScrollView>
@@ -60,6 +74,11 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     gap: 8,
+    marginBottom: 8,
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
     marginBottom: 8,
   },
 });
