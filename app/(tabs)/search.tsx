@@ -1,22 +1,23 @@
-import { getRandomMeals, searchMeals } from '@/api/mealdb';
+import { getRandomMeals, searchIngredients, searchMeals } from '@/api/mealdb';
+import { IngredientCard } from '@/components/IngredientCard';
 import { ThemedInput } from '@/components/ThemedInput';
 import { ThemedView } from '@/components/ThemedView';
+import { FavoritesContext } from '@/context/FavoritesContext';
+import { useThemeColor } from '@/hooks/useThemeColor';
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useState, useContext } from 'react';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import React, { useCallback, useContext, useState } from 'react';
+import { useAvailableIngredients } from "@/context/AvailableIngredientsContext";
 import {
   FlatList,
   Keyboard,
   StyleSheet,
+  Switch,
   Text,
-  TouchableOpacity,
-  View,
+  TouchableOpacity
 } from 'react-native';
 import { MealCard } from '../../components/MealCard';
-import { FavoritesContext } from '@/context/FavoritesContext';
-import { useThemeColor } from '@/hooks/useThemeColor';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type RootStackParamList = {
   Search: undefined;
@@ -29,6 +30,7 @@ type SearchScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 export default function Search() {
+  const [searchMode, setSearchMode] = useState<'meals' | 'ingredients'>('meals');
   const navigation = useNavigation<SearchScreenNavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
   const [allMeals, setAllMeals] = useState<any[]>([]);
@@ -41,39 +43,67 @@ export default function Search() {
   const primary = useThemeColor({}, 'primary');
   const secondary = useThemeColor({}, 'secondary');
   const [isFocused, setIsFocused] = useState(false);
-
+const { toggleIngredient, isAvailable } = useAvailableIngredients();
 
   useFocusEffect(
     useCallback(() => {
-      const fetchRandom = async () => {
-        const meals = await getRandomMeals(10);
-        setAllMeals(meals);
-        setResults(meals);
-        setVisibleCount(10);
-        setSearchQuery('');
-        setShowingRandom(true);
+      const fetchInitial = async () => {
+        if (searchMode === 'meals') {
+          const meals = await getRandomMeals(10);
+          setAllMeals(meals);
+          setResults(meals);
+          setVisibleCount(10);
+          setSearchQuery('');
+          setShowingRandom(true);
+        } else {
+          // Búsqueda por defecto de ingredientes, por ejemplo "chicken"
+          const ingredients = await searchIngredients('chicken');
+          setAllMeals(ingredients);
+          setResults(ingredients.slice(0, 10));
+          setVisibleCount(10);
+          setShowingRandom(false);
+        }
       };
-      fetchRandom();
-    }, [])
+
+      fetchInitial();
+    }, [searchMode])
   );
 
   const handleSearch = async () => {
     if (searchQuery.trim().length === 0) {
-      const meals = await getRandomMeals(10);
-      setAllMeals(meals);
-      setResults(meals);
-      setVisibleCount(10);
-      setShowingRandom(true);
+      if (searchMode === 'meals') {
+        const meals = await getRandomMeals(10);
+        setAllMeals(meals);
+        setResults(meals);
+        setVisibleCount(10);
+        setShowingRandom(true);
+      } else {
+        const defaultQuery = 'chicken';
+        const ingredients = await searchIngredients(defaultQuery);
+        setAllMeals(ingredients);
+        setResults(ingredients.slice(0, 10));
+        setVisibleCount(10);
+        setShowingRandom(false);
+      }
       return;
     }
-    const meals = await searchMeals(searchQuery);
-    const filtered = meals.filter((meal: any) =>
-      meal.strMeal.toLowerCase().startsWith(searchQuery.toLowerCase())
-    );
-    setAllMeals(filtered);
-    setResults(filtered.slice(0, 10));
-    setVisibleCount(10);
-    setShowingRandom(false);
+    if (searchMode === 'meals') {
+      const meals = await searchMeals(searchQuery);
+      const filtered = meals.filter((meal: any) =>
+        meal.strMeal.toLowerCase().startsWith(searchQuery.toLowerCase())
+      );
+      setAllMeals(filtered);
+      setResults(filtered.slice(0, 10));
+      setVisibleCount(10);
+      setShowingRandom(false);
+    } else {
+      const ingredients = await searchIngredients(searchQuery);
+      setAllMeals(ingredients);
+      setResults(ingredients.slice(0, 10));
+      setVisibleCount(10);
+      setShowingRandom(false);
+    }
+    
     Keyboard.dismiss();
   };
 
@@ -105,20 +135,52 @@ export default function Search() {
           onBlur={() => setIsFocused(false)}
         />
       </ThemedView>
+      
+      <ThemedView style={styles.switchContainer}>
+        <Text style={{ color: textColor, marginRight: 8 }}>Modo de búsqueda:</Text>
+        <Text style={{ color: primary }}>{searchMode === 'meals' ? 'Recetas' : 'Ingredientes'}</Text>
+        <Switch
+          value={searchMode === 'ingredients'}
+          onValueChange={(value) => setSearchMode(value ? 'ingredients' : 'meals')}
+          thumbColor={primary}
+          trackColor={{ false: '#999', true: secondary }}
+          style={{ marginLeft: 8 }}
+        />
+      </ThemedView>
 
       <FlatList
         data={results}
-        keyExtractor={(item) => `meal-${item.idMeal}`}
-        renderItem={({ item }) => (
-          <MealCard
-            meal={item}
-            onPress={() => goToMealDetail(item.idMeal)}
-            isFavorite={isMealFavorite(item)}
-            onToggleFavorite={() => toggleFavorite(item)}
-            style={{width: 360}}
-            />
-        )}
-        ListEmptyComponent={<Text style={styles.emptyText}>No hay resultados</Text>}
+        keyExtractor={(item, index) =>
+          `item-${item.idMeal ?? item.idIngredient ?? index}`
+        }
+        renderItem={({ item }) => {
+          if (searchMode === 'meals') {
+            return (
+              <MealCard
+                meal={item}
+                onPress={() => goToMealDetail(item.idMeal)}
+                isFavorite={isMealFavorite(item)}
+                onToggleFavorite={() => toggleFavorite(item)}
+                style={{ width: 360 }}
+              />
+            );
+          } else if (item.strIngredient) {
+            return (
+              <IngredientCard 
+                ingredient={item} 
+                isAvailable={isAvailable(item)}
+                onToggleAvailable={() => toggleIngredient(item)} 
+              />
+            );
+          } else {
+            return null; // Ignora cualquier objeto que no sea un ingrediente válido
+          }
+        }}
+        ListEmptyComponent={
+          <Text style={[styles.emptyText, { color: textColor }]}>
+            No hay resultados
+          </Text>
+        }
         contentContainerStyle={results.length === 0 ? styles.emptyContainer : undefined}
       />
       {results.length > 0 && results.length < allMeals.length && (
@@ -175,5 +237,11 @@ const styles = StyleSheet.create({
   loadMoreText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 10,
   },
 });
