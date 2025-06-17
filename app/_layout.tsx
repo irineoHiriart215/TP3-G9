@@ -7,6 +7,7 @@ import { AuthProvider } from '../context/AuthContext';
 import { ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
 import { ThemeProvider as AppThemeProvider, useThemeContext } from '@/context/ThemeContext';
 import { MyDarkTheme, MyLightTheme } from '@/navigation/theme';
+import { AvailableIngredientsProvider } from '@/context/AvailableIngredientsContext';
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -16,13 +17,15 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <AuthProvider>
-      <FavoritesProvider>
-        <AppThemeProvider>
-          <RootLayoutWithTheme />
-        </AppThemeProvider>
-      </FavoritesProvider>
-    </AuthProvider>
+      <AuthProvider>
+        <AvailableIngredientsProvider>
+          <FavoritesProvider>
+            <AppThemeProvider>
+              <RootLayoutWithTheme />
+            </AppThemeProvider>
+          </FavoritesProvider>
+        </AvailableIngredientsProvider>
+      </AuthProvider>
   );
 }
 

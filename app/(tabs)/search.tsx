@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useCallback, useContext, useState } from 'react';
+import { useAvailableIngredients } from "@/context/AvailableIngredientsContext";
 import {
   FlatList,
   Keyboard,
@@ -42,7 +43,7 @@ export default function Search() {
   const primary = useThemeColor({}, 'primary');
   const secondary = useThemeColor({}, 'secondary');
   const [isFocused, setIsFocused] = useState(false);
-
+const { toggleIngredient, isAvailable } = useAvailableIngredients();
 
   useFocusEffect(
     useCallback(() => {
@@ -167,7 +168,8 @@ export default function Search() {
             return (
               <IngredientCard 
                 ingredient={item} 
-                onPress={() => console.log("Ingrediente presionado:", item.strIngredient)} 
+                isAvailable={isAvailable(item)}
+                onToggleAvailable={() => toggleIngredient(item)} 
               />
             );
           } else {

@@ -47,19 +47,6 @@ export async function getMealById(idMeal: string) {
   }
 }
 
-export async function getAllIngredients() {
-  const url = `${BASE_DIR}/list.php?i=list`;
-
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    return data.meals || [];
-  } catch (error) {
-    console.error("Error al obtener ingredientes:", error);
-    return [];
-  }
-}
-
 export async function searchIngredients(query: string) {
   const url = `${BASE_DIR}/list.php?i=list`;
   console.log("URL usada para ingredientes (lista completa):", url);
