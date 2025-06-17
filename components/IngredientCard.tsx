@@ -21,7 +21,7 @@ export const IngredientCard = ({ ingredient }: IngredientsCardProps) => {
     return (
 
     <View style={[styles.card, { backgroundColor: background }]}>
-      <Text style={[styles.name, { color: secondary }]}>
+      <Text style={[styles.name, { color: textColor }]}>
         {ingredient.strIngredient}
       </Text>
       {ingredient.strType ? (
