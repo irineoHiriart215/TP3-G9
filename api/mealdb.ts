@@ -61,15 +61,19 @@ export async function getAllIngredients() {
 }
 
 export async function searchIngredients(query: string) {
-  const url = `${BASE_DIR}/search.php?i=${encodeURIComponent(query)}`;
-  console.log("URL usada para ingredientes:", url);
+  const url = `${BASE_DIR}/list.php?i=list`;
+  console.log("URL usada para ingredientes (lista completa):", url);
 
   try {
     const response = await fetch(url);
-    const text = await response.text();
-    console.log("Respuesta RAW ingredientes:", text);
-    const data = JSON.parse(text);
-    return data.ingredients || [];
+    const data = await response.json();
+    const allIngredients = data.meals || [];
+
+    const filtered = allIngredients.filter((ingredient: any) =>
+      ingredient.strIngredient.toLowerCase().includes(query.toLowerCase())
+    );
+
+    return filtered;
   } catch (error) {
     console.error("Error al buscar ingredientes:", error);
     return [];

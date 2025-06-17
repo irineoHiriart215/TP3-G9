@@ -1,24 +1,22 @@
-import { getRandomMeals, searchMeals, searchIngredients } from '@/api/mealdb';
+import { getRandomMeals, searchIngredients, searchMeals } from '@/api/mealdb';
+import { IngredientCard } from '@/components/IngredientCard';
 import { ThemedInput } from '@/components/ThemedInput';
 import { ThemedView } from '@/components/ThemedView';
+import { FavoritesContext } from '@/context/FavoritesContext';
+import { useThemeColor } from '@/hooks/useThemeColor';
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useState, useContext } from 'react';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import React, { useCallback, useContext, useState } from 'react';
 import {
   FlatList,
   Keyboard,
   StyleSheet,
+  Switch,
   Text,
-  TouchableOpacity,
-  View,
-  Switch
+  TouchableOpacity
 } from 'react-native';
 import { MealCard } from '../../components/MealCard';
-import { IngredientCard } from '@/components/IngredientCard';
-import { FavoritesContext } from '@/context/FavoritesContext';
-import { useThemeColor } from '@/hooks/useThemeColor';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type RootStackParamList = {
   Search: undefined;
@@ -80,11 +78,8 @@ export default function Search() {
       setShowingRandom(false);
     } else {
       const ingredients = await searchIngredients(searchQuery);
-      const filtered = ingredients.filter((ingredient: any) =>
-        ingredient.strIngredient.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setAllMeals(filtered);
-      setResults(filtered.slice(0, 10));
+      setAllMeals(ingredients);
+      setResults(ingredients.slice(0, 10));
       setVisibleCount(10);
       setShowingRandom(false);
     }
