@@ -6,7 +6,7 @@ import { FavoritesProvider } from '../context/FavoritesContext';
 import { AuthProvider } from '../context/AuthContext';
 import { ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
 import { ThemeProvider as AppThemeProvider, useThemeContext } from '@/context/ThemeContext';
-import { MyDarkTheme, MyLightTheme } from '@/navigation/theme'; // 👈 nuevo import
+import { MyDarkTheme, MyLightTheme } from '@/navigation/theme';
 
 export default function RootLayout() {
   const [loaded] = useFonts({

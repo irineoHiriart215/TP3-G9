@@ -28,7 +28,7 @@ export default function Login() {
 
     try {
       await login(email, password);
-      router.replace('/(tabs)/home'); // redirige a home si inicia sesión correctamente
+      router.replace('/(tabs)/home');
       setError('');
     } catch (error: any) {
       setError(error.message || 'Error al iniciar sesión');

@@ -2,8 +2,7 @@ import React, { Children, PropsWithChildren } from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/ThemedView';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { Colors } from '@/constants/Colors'; 
+import { useThemeColor } from '@/hooks/useThemeColor';
 
 type Props = PropsWithChildren<{
   title?: string;
@@ -17,21 +16,21 @@ export default function ParallaxScrollView({
   scrollable = true,
   children,
 }: Props) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const textColor = useThemeColor({}, 'text');
+  const backgroundColor = useThemeColor({}, 'background');
   const ScrollRef = React.useRef<ScrollView>(null);
 
   const Header = () => (
     (title || subtitle) && (
        <ThemedView style={styles.header}>
-        {title && <Text style={[styles.title, {color: colors.text}]}>{title}</Text>}
-        {subtitle && <Text style={[styles.subtitle, {color: colors.text}]}>{subtitle}</Text>}
+        {title && <Text style={[styles.title, {color: textColor}]}>{title}</Text>}
+        {subtitle && <Text style={[styles.subtitle, {color: textColor}]}>{subtitle}</Text>}
       </ThemedView>
     )
   )
 
   return (
-    <SafeAreaView style={[styles.safeArea, {backgroundColor: colors.background}]}>
+    <SafeAreaView style={[styles.safeArea, {backgroundColor: backgroundColor}]}>
       {scrollable ? (
         <ScrollView
           ref={ScrollRef}

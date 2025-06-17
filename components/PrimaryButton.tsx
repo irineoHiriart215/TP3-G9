@@ -7,8 +7,7 @@ import {
   StyleProp,
 } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { Colors } from '@/constants/Colors'; 
+import { useThemeColor } from '@/hooks/useThemeColor';
 
 type PrimaryButtonProps = {
   title: string;
@@ -17,15 +16,15 @@ type PrimaryButtonProps = {
 };
 
 const PrimaryButton: React.FC<PrimaryButtonProps> = ({ title, onPress, style }) => {
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const textColor = useThemeColor({}, 'text');
+  const primaryColor = useThemeColor({},'primary')
   return (
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.8}
-      style={[styles.button, style, {backgroundColor: colors.primary}]}
+      style={[styles.button, style, {backgroundColor: primaryColor}]}
     >
-      <ThemedText type="defaultSemiBold" style={[styles.buttonText,{ color: colors.text}]}>
+      <ThemedText type="defaultSemiBold" style={[styles.buttonText,{ color: textColor}]}>
         {title}
       </ThemedText>
     </TouchableOpacity>
