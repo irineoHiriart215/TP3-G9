@@ -2,9 +2,8 @@ import React, { Children, PropsWithChildren } from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/ThemedView';
-import { useColorScheme } from '@/hooks/useColorScheme';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { Colors } from '@/constants/Colors'; 
+import { useThemeColor } from '@/hooks/useThemeColor';
 
 type Props = PropsWithChildren<{
   title?: string;
@@ -18,47 +17,45 @@ export default function ParallaxScrollView({
   scrollable = true,
   children,
 }: Props) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
   const ScrollRef = React.useRef<ScrollView>(null);
+
   let tabBarHeight = 0;
   try {
     tabBarHeight = useBottomTabBarHeight();
   } catch (e) {
-    tabBarHeight = 0; // fallback si no está dentro del tab navigator
+    tabBarHeight = 0;
   }
 
-
-  const Header = () => (
+  const Header = () =>
     (title || subtitle) && (
-       <ThemedView style={styles.header}>
-        {title && <Text style={[styles.title, {color: colors.text}]}>{title}</Text>}
-        {subtitle && <Text style={[styles.subtitle, {color: colors.text}]}>{subtitle}</Text>}
+      <ThemedView style={styles.header}>
+        {title && <Text style={[styles.title, { color: textColor }]}>{title}</Text>}
+        {subtitle && <Text style={[styles.subtitle, { color: textColor }]}>{subtitle}</Text>}
       </ThemedView>
-    )
-  )
+    );
 
   return (
-    <SafeAreaView style={[styles.safeArea, {backgroundColor: colors.background}]}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
       {scrollable ? (
         <ScrollView
           ref={ScrollRef}
-          style={styles.flex}
+          style={[styles.flex, { backgroundColor }]}
           contentContainerStyle={[
             styles.content,
-            scrollable && { paddingBottom: tabBarHeight +20},
+            scrollable && { paddingBottom: tabBarHeight + 20 },
           ]}
         >
           <Header />
-          { children }
+          {children}
         </ScrollView>
-      ):(
+      ) : (
         <ThemedView style={[styles.flex, styles.content]}>
-        <Header />
-        {children}
-      </ThemedView>
+          <Header />
+          {children}
+        </ThemedView>
       )}
-      
     </SafeAreaView>
   );
 }

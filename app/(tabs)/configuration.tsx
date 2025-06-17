@@ -1,24 +1,22 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, Image } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
-import { Ionicons } from '@expo/vector-icons';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { SettingsItem }  from '@/components/SettingsItem';
 import { useAuth } from '@/context/AuthContext';
+import { useThemeContext } from '@/context/ThemeContext'; 
 
 export default function Settings() {
-  const primaryColor = useThemeColor({}, 'primary');
-  const cardColor = useThemeColor({}, 'card');
-  const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
   const { user, logout } = useAuth();
+  const { toggleTheme, theme } = useThemeContext();
 
   return (
     <ParallaxScrollView title="Configuración" scrollable={false}>
       <ThemedView style={styles.container}>
-        <ThemedView style={[styles.profileContainer, { backgroundColor: backgroundColor }]}>
+        <ThemedView style={[styles.profileContainer, { backgroundColor: useThemeColor({}, 'background') }]}>
           <Image
             source={{
               uri: `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name ?? '')}`,
@@ -31,7 +29,9 @@ export default function Settings() {
 
         <View style={styles.section}>
           <SectionTitle title="Preferencias" />
-          <SettingsItem icon="moon" text="Tema: Claro / Oscuro" />
+          <SettingsItem icon="moon"
+           text= {`Tema: ${theme === 'light' ? 'Claro' : 'Oscuro'}`}
+           onPress={toggleTheme} />
           <SettingsItem icon="notifications" text="Notificaciones" />
           <SettingsItem icon="language" text="Idioma: Español" />
         </View>

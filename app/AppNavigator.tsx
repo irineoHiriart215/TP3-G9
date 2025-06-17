@@ -1,5 +1,4 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -35,7 +34,6 @@ export default function AppNavigator() {
   const colors = Colors[colorScheme];
 
   return (
-    <NavigationContainer theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarBackground: () => (
@@ -70,6 +68,5 @@ export default function AppNavigator() {
       >
         <Tab.Screen name="SearchTab" component={SearchStack} options={{ title: 'Buscar' }} />
       </Tab.Navigator>
-    </NavigationContainer>
   );
 }

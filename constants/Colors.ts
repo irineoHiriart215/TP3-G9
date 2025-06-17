@@ -22,6 +22,7 @@ export const Colors = {
   dark: {
     text: '#E3d5BB',
     background: '#1A2228',
+    tint: '#E3d5BB', 
     card: '#912B29',
     border: '#912B29',
     icon: '#191E21',
