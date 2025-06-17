@@ -46,3 +46,32 @@ export async function getMealById(idMeal: string) {
     return null;
   }
 }
+
+export async function getAllIngredients() {
+  const url = `${BASE_DIR}/list.php?i=list`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    return data.meals || [];
+  } catch (error) {
+    console.error("Error al obtener ingredientes:", error);
+    return [];
+  }
+}
+
+export async function searchIngredients(query: string) {
+  const url = `${BASE_DIR}/search.php?i=${encodeURIComponent(query)}`;
+  console.log("URL usada para ingredientes:", url);
+
+  try {
+    const response = await fetch(url);
+    const text = await response.text();
+    console.log("Respuesta RAW ingredientes:", text);
+    const data = JSON.parse(text);
+    return data.ingredients || [];
+  } catch (error) {
+    console.error("Error al buscar ingredientes:", error);
+    return [];
+  }
+}

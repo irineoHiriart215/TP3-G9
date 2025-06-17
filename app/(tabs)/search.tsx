@@ -1,4 +1,4 @@
-import { getRandomMeals, searchMeals } from '@/api/mealdb';
+import { getRandomMeals, searchMeals, searchIngredients } from '@/api/mealdb';
 import { ThemedInput } from '@/components/ThemedInput';
 import { ThemedView } from '@/components/ThemedView';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,8 +11,10 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Switch
 } from 'react-native';
 import { MealCard } from '../../components/MealCard';
+import { IngredientCard } from '@/components/IngredientCard';
 import { FavoritesContext } from '@/context/FavoritesContext';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useNavigation } from '@react-navigation/native';
@@ -29,6 +31,7 @@ type SearchScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 export default function Search() {
+  const [searchMode, setSearchMode] = useState<'meals' | 'ingredients'>('meals');
   const navigation = useNavigation<SearchScreenNavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
   const [allMeals, setAllMeals] = useState<any[]>([]);
@@ -66,14 +69,26 @@ export default function Search() {
       setShowingRandom(true);
       return;
     }
-    const meals = await searchMeals(searchQuery);
-    const filtered = meals.filter((meal: any) =>
-      meal.strMeal.toLowerCase().startsWith(searchQuery.toLowerCase())
-    );
-    setAllMeals(filtered);
-    setResults(filtered.slice(0, 10));
-    setVisibleCount(10);
-    setShowingRandom(false);
+    if (searchMode === 'meals') {
+      const meals = await searchMeals(searchQuery);
+      const filtered = meals.filter((meal: any) =>
+        meal.strMeal.toLowerCase().startsWith(searchQuery.toLowerCase())
+      );
+      setAllMeals(filtered);
+      setResults(filtered.slice(0, 10));
+      setVisibleCount(10);
+      setShowingRandom(false);
+    } else {
+      const ingredients = await searchIngredients(searchQuery);
+      const filtered = ingredients.filter((ingredient: any) =>
+        ingredient.strIngredient.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setAllMeals(filtered);
+      setResults(filtered.slice(0, 10));
+      setVisibleCount(10);
+      setShowingRandom(false);
+    }
+    
     Keyboard.dismiss();
   };
 
@@ -105,20 +120,46 @@ export default function Search() {
           onBlur={() => setIsFocused(false)}
         />
       </ThemedView>
+      
+      <ThemedView style={styles.switchContainer}>
+        <Text style={{ color: textColor, marginRight: 8 }}>Modo de búsqueda:</Text>
+        <Text style={{ color: primary }}>{searchMode === 'meals' ? 'Recetas' : 'Ingredientes'}</Text>
+        <Switch
+          value={searchMode === 'ingredients'}
+          onValueChange={(value) => setSearchMode(value ? 'ingredients' : 'meals')}
+          thumbColor={primary}
+          trackColor={{ false: '#999', true: secondary }}
+          style={{ marginLeft: 8 }}
+        />
+      </ThemedView>
 
       <FlatList
         data={results}
-        keyExtractor={(item) => `meal-${item.idMeal}`}
-        renderItem={({ item }) => (
-          <MealCard
-            meal={item}
-            onPress={() => goToMealDetail(item.idMeal)}
-            isFavorite={isMealFavorite(item)}
-            onToggleFavorite={() => toggleFavorite(item)}
-            style={{width: 360}}
-            />
-        )}
-        ListEmptyComponent={<Text style={styles.emptyText}>No hay resultados</Text>}
+        keyExtractor={(item) => `item-${item.idMeal || item.idIngredient}`}
+        renderItem={({ item }) => {
+          if (searchMode === 'meals') {
+            return (
+              <MealCard
+                meal={item}
+                onPress={() => goToMealDetail(item.idMeal)}
+                isFavorite={isMealFavorite(item)}
+                onToggleFavorite={() => toggleFavorite(item)}
+                style={{ width: 360 }}
+              />
+            );
+          } else {
+            return (
+              <IngredientCard 
+              ingredient={item} 
+              onPress={() => console.log("Ingrediente presionado:", item.strIngredient)} />
+            );
+          }
+        }}
+        ListEmptyComponent={
+          <Text style={[styles.emptyText, { color: textColor }]}>
+            No hay resultados
+          </Text>
+        }
         contentContainerStyle={results.length === 0 ? styles.emptyContainer : undefined}
       />
       {results.length > 0 && results.length < allMeals.length && (
@@ -175,5 +216,11 @@ const styles = StyleSheet.create({
   loadMoreText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 10,
   },
 });
