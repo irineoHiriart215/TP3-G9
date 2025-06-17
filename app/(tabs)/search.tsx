@@ -46,25 +46,44 @@ export default function Search() {
 
   useFocusEffect(
     useCallback(() => {
-      const fetchRandom = async () => {
-        const meals = await getRandomMeals(10);
-        setAllMeals(meals);
-        setResults(meals);
-        setVisibleCount(10);
-        setSearchQuery('');
-        setShowingRandom(true);
+      const fetchInitial = async () => {
+        if (searchMode === 'meals') {
+          const meals = await getRandomMeals(10);
+          setAllMeals(meals);
+          setResults(meals);
+          setVisibleCount(10);
+          setSearchQuery('');
+          setShowingRandom(true);
+        } else {
+          // Búsqueda por defecto de ingredientes, por ejemplo "chicken"
+          const ingredients = await searchIngredients('chicken');
+          setAllMeals(ingredients);
+          setResults(ingredients.slice(0, 10));
+          setVisibleCount(10);
+          setShowingRandom(false);
+        }
       };
-      fetchRandom();
-    }, [])
+
+      fetchInitial();
+    }, [searchMode])
   );
 
   const handleSearch = async () => {
     if (searchQuery.trim().length === 0) {
-      const meals = await getRandomMeals(10);
-      setAllMeals(meals);
-      setResults(meals);
-      setVisibleCount(10);
-      setShowingRandom(true);
+      if (searchMode === 'meals') {
+        const meals = await getRandomMeals(10);
+        setAllMeals(meals);
+        setResults(meals);
+        setVisibleCount(10);
+        setShowingRandom(true);
+      } else {
+        const defaultQuery = 'chicken';
+        const ingredients = await searchIngredients(defaultQuery);
+        setAllMeals(ingredients);
+        setResults(ingredients.slice(0, 10));
+        setVisibleCount(10);
+        setShowingRandom(false);
+      }
       return;
     }
     if (searchMode === 'meals') {
@@ -130,7 +149,9 @@ export default function Search() {
 
       <FlatList
         data={results}
-        keyExtractor={(item) => `item-${item.idMeal || item.idIngredient}`}
+        keyExtractor={(item, index) =>
+          `item-${item.idMeal ?? item.idIngredient ?? index}`
+        }
         renderItem={({ item }) => {
           if (searchMode === 'meals') {
             return (
@@ -142,12 +163,15 @@ export default function Search() {
                 style={{ width: 360 }}
               />
             );
-          } else {
+          } else if (item.strIngredient) {
             return (
               <IngredientCard 
-              ingredient={item} 
-              onPress={() => console.log("Ingrediente presionado:", item.strIngredient)} />
+                ingredient={item} 
+                onPress={() => console.log("Ingrediente presionado:", item.strIngredient)} 
+              />
             );
+          } else {
+            return null; // Ignora cualquier objeto que no sea un ingrediente válido
           }
         }}
         ListEmptyComponent={
